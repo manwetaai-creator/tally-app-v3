@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy Policy - Manweta AI</title><link rel="icon" href="/assets/logo.png">
+<style>
+body{margin:0;font:16px/1.65 "IBM Plex Sans",system-ui,Arial,sans-serif;color:#1c1b29;background:#f6f6fb}
+header{background:#fff;border-bottom:1px solid #e4e3f0;padding:14px 24px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+header a.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:#4b3fd1;text-decoration:none;margin-right:auto}
+header img{height:30px} header nav a{color:#4b3fd1;text-decoration:none;font-size:14px;margin-left:14px}
+main{max-width:820px;margin:28px auto;padding:0 20px 60px}
+.card{background:#fff;border:1px solid #e4e3f0;border-radius:12px;padding:28px 32px}
+h1{margin:0 0 4px;font-size:30px} h2{font-size:19px;margin:28px 0 6px} .muted{color:#6b6a80;font-size:14px}
+a{color:#4b3fd1} code{background:#f0effa;padding:1px 6px;border-radius:5px}
+</style></head><body>
+<header><a class="brand" href="/"><img src="/assets/logo.png" alt="">Manweta AI</a>
+<nav><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a><a href="/data-deletion">Data deletion</a><a href="mailto:support@manweta.com">Contact</a></nav></header>
+<main><h1>Privacy Policy</h1><p class="muted">How Manweta AI handles accounting and WhatsApp messaging data. Effective October 2026.</p><div class="card">
+<h2>1. Overview</h2>
+<p>Manweta AI ("we", "our", or "us") provides a software-as-a-service platform that connects Tally ERP / Tally Prime accounting records with the WhatsApp Business Platform to send payment reminders and track collections. We respect the privacy of our business customers ("tenants") and of their own customers (sundry debtors). We never sell, rent, or trade accounting or contact data to third parties or advertising networks.</p>
+<h2>2. Information we process</h2>
+<ul>
+<li><b>Debtor / customer data:</b> ledger names, contact names, WhatsApp mobile numbers and opt-out preferences.</li>
+<li><b>Financial and invoice records:</b> Tally bill references, invoice and due dates, outstanding balances and payment status.</li>
+<li><b>WhatsApp messaging data:</b> message IDs, delivery and read timestamps, and inbound customer replies (such as payment references or STOP requests).</li>
+<li><b>Account data:</b> organisation name, administrator email address, password hashes, and the WhatsApp Business access token granted through Meta Embedded Signup (encrypted at rest and never shown in the app).</li>
+</ul>
+<h2>3. How we use it</h2>
+<ul>
+<li>Calculating overdue balances and deciding which reminders are due under the rules a tenant configures.</li>
+<li>Sending WhatsApp payment reminders using approved message templates, from the tenant's own WhatsApp Business account.</li>
+<li>Recording delivery and read receipts, and honouring opt-out requests so that unsubscribed contacts are not messaged again.</li>
+<li>Managing the tenant's WhatsApp phone number and message templates on the tenant's behalf, as authorised by the tenant during Meta Embedded Signup.</li>
+</ul>
+<h2>4. WhatsApp Business Platform and Meta</h2>
+<p>Messages are sent through the official Meta WhatsApp Business Platform (Cloud API) under the tenant's own WhatsApp Business Account. The tenant keeps ownership of that account and can disconnect Manweta AI at any time from the WhatsApp page in the dashboard, which deletes the stored access token. Use of WhatsApp is also subject to Meta's own terms and policies.</p>
+<h2>5. Security</h2>
+<ul>
+<li>Every tenant's data is logically separated by tenant ID.</li>
+<li>Data is transmitted over TLS. WhatsApp access tokens are encrypted at rest.</li>
+<li>The Tally connector uses single-use activation codes and unique secret tokens, and only reads data from Tally.</li>
+</ul>
+<h2>6. Your rights and opt-outs</h2>
+<ul>
+<li>A debtor can reply <code>STOP</code> to any reminder and is marked as opted out immediately.</li>
+<li>Tenants can export or delete their stored data at any time. See <a href="/data-deletion">how to request deletion</a>.</li>
+</ul>
+<h2>7. Contact</h2>
+<p>Manweta AI Privacy Office &middot; <a href="mailto:support@manweta.com">support@manweta.com</a></p>
+</div></main></body></html>
