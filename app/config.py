@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     meta_phone_registration_pin: str = ""
     meta_auto_register_phone: bool = True
     meta_http_timeout_seconds: float = 20.0
+    # Temporary, tightly restricted App Review demo sender. Keep these server-side only.
+    meta_demo_access_token: str = ""
+    meta_demo_phone_number_id: str = ""
+    meta_demo_recipient: str = ""
+    meta_demo_access_key: str = ""
 
     # --- Windows installer / Azure Blob Storage ----------------------------
     windows_installer_version: str = "v1.4.2"

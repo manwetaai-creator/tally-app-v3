@@ -134,3 +134,10 @@ See `APP_REVIEW.md` for the app-settings checklist, the exact recording steps fo
 New in this build: **WhatsApp -> Message templates** (create/list/delete via the Graph API), `hello_world` fallback for "Send test"
 while the custom template is under review, plain-HTML `/privacy`, `/terms`, `/data-deletion` pages, and a mandatory webhook verify token.
 `deploy/azure-deploy.sh` now generates (and keeps) `META_WEBHOOK_VERIFY_TOKEN` and defaults `INSECURE_PASSWORD_RESET` to `false`.
+
+For a temporary first-video demo, `/whatsapp-demo.html` sends Meta's `hello_world` template through
+`POST /api/v1/demo/whatsapp/send`. Configure `META_DEMO_ACCESS_TOKEN`, `META_DEMO_PHONE_NUMBER_ID`,
+`META_DEMO_RECIPIENT`, and a strong `META_DEMO_ACCESS_KEY` server-side. The endpoint only accepts that one
+recipient and never exposes the Meta token to the browser. Remove or disable the demo settings and endpoint
+after recording App Review evidence. Confirm the legal-page statements in `static/pages/` match the deployed
+data practices before publishing them.

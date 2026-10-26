@@ -10,7 +10,7 @@ from sqlalchemy import text
 
 from .config import get_settings
 from .db import SessionLocal, engine, init_db
-from .routers import auth, connector, portal, webhook
+from .routers import auth, connector, demo_whatsapp, portal, webhook
 from .seed import seed_demo
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -64,6 +64,7 @@ app.include_router(portal.router)
 app.include_router(portal.public_router)
 app.include_router(connector.router)
 app.include_router(webhook.router)
+app.include_router(demo_whatsapp.router)
 
 app.mount("/assets", StaticFiles(directory=STATIC / "assets"), name="assets")
 if (STATIC / "blobs").is_dir():

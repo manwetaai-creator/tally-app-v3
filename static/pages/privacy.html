@@ -13,36 +13,35 @@ a{color:#4b3fd1} code{background:#f0effa;padding:1px 6px;border-radius:5px}
 </style></head><body>
 <header><a class="brand" href="/"><img src="/assets/logo.png" alt="">Manweta AI</a>
 <nav><a href="/privacy">Privacy Policy</a><a href="/terms">Terms</a><a href="/data-deletion">Data deletion</a><a href="mailto:support@manweta.com">Contact</a></nav></header>
-<main><h1>Privacy Policy</h1><p class="muted">How Manweta AI handles accounting and WhatsApp messaging data. Effective October 2026.</p><div class="card">
-<h2>1. Overview</h2>
-<p>Manweta AI ("we", "our", or "us") provides a software-as-a-service platform that connects Tally ERP / Tally Prime accounting records with the WhatsApp Business Platform to send payment reminders and track collections. We respect the privacy of our business customers ("tenants") and of their own customers (sundry debtors). We never sell, rent, or trade accounting or contact data to third parties or advertising networks.</p>
+<main><h1>Privacy Policy</h1><p class="muted">Last updated: October 26, 2026</p><div class="card">
+<h2>1. About Manweta AI</h2>
+<p>Manweta AI ("Manweta AI", "we", "us", or "our") provides software that helps businesses work with accounting and receivables information, manage payment reminders, and use the WhatsApp Business Platform. This policy explains how we process information about our business customers and the customers of those businesses.</p>
 <h2>2. Information we process</h2>
 <ul>
-<li><b>Debtor / customer data:</b> ledger names, contact names, WhatsApp mobile numbers and opt-out preferences.</li>
-<li><b>Financial and invoice records:</b> Tally bill references, invoice and due dates, outstanding balances and payment status.</li>
-<li><b>WhatsApp messaging data:</b> message IDs, delivery and read timestamps, and inbound customer replies (such as payment references or STOP requests).</li>
-<li><b>Account data:</b> organisation name, administrator email address, password hashes, and the WhatsApp Business access token granted through Meta Embedded Signup (encrypted at rest and never shown in the app).</li>
+<li><b>Business account information:</b> business or organisation name, account administrator details, email address, authentication information, and service configuration.</li>
+<li><b>Customer and contact information:</b> names, mobile numbers, and other contact details entered by a business customer or obtained through its configured accounting integration.</li>
+<li><b>Accounting and payment information:</b> bill or invoice references, invoice and due dates, outstanding amounts, and payment status or related receivables information.</li>
+<li><b>WhatsApp message information:</b> message content and history handled by the service, message identifiers, timestamps, delivery/read/failure statuses when provided by WhatsApp, and replies or other inbound messages received by the integration.</li>
+<li><b>Integration information:</b> WhatsApp Business Account and phone-number identifiers, template information, API response information, and credentials or tokens needed to operate the integration.</li>
+<li><b>Technical and support information:</b> information included in error reports, support requests, and service logs where generated.</li>
 </ul>
-<h2>3. How we use it</h2>
+<h2>3. How we use information</h2>
 <ul>
-<li>Calculating overdue balances and deciding which reminders are due under the rules a tenant configures.</li>
-<li>Sending WhatsApp payment reminders using approved message templates, from the tenant's own WhatsApp Business account.</li>
-<li>Recording delivery and read receipts, and honouring opt-out requests so that unsubscribed contacts are not messaged again.</li>
-<li>Managing the tenant's WhatsApp phone number and message templates on the tenant's behalf, as authorised by the tenant during Meta Embedded Signup.</li>
+<li>Provide and operate the Manweta AI service and its accounting/receivables features.</li>
+<li>Identify due or overdue bills and prepare payment reminders according to the business customer's settings.</li>
+<li>Send and manage WhatsApp messages and display message status information returned by WhatsApp.</li>
+<li>Store message history and related delivery status in the database so business customers can review activity and troubleshoot delivery.</li>
+<li>Maintain accounts, secure the service, respond to support requests, and investigate errors or misuse.</li>
+<li>Meet legal obligations and enforce our terms where necessary.</li>
 </ul>
-<h2>4. WhatsApp Business Platform and Meta</h2>
-<p>Messages are sent through the official Meta WhatsApp Business Platform (Cloud API) under the tenant's own WhatsApp Business Account. The tenant keeps ownership of that account and can disconnect Manweta AI at any time from the WhatsApp page in the dashboard, which deletes the stored access token. Use of WhatsApp is also subject to Meta's own terms and policies.</p>
-<h2>5. Security</h2>
-<ul>
-<li>Every tenant's data is logically separated by tenant ID.</li>
-<li>Data is transmitted over TLS. WhatsApp access tokens are encrypted at rest.</li>
-<li>The Tally connector uses single-use activation codes and unique secret tokens, and only reads data from Tally.</li>
-</ul>
-<h2>6. Your rights and opt-outs</h2>
-<ul>
-<li>A debtor can reply <code>STOP</code> to any reminder and is marked as opted out immediately.</li>
-<li>Tenants can export or delete their stored data at any time. See <a href="/data-deletion">how to request deletion</a>.</li>
-</ul>
-<h2>7. Contact</h2>
-<p>Manweta AI Privacy Office &middot; <a href="mailto:support@manweta.com">support@manweta.com</a></p>
+<h2>4. Business customers and their customers</h2>
+<p>Our business customers decide which customer, contact, invoice, and payment information to connect or enter and how to use it in their workflows. They are responsible for ensuring they have the necessary rights and lawful basis to provide this information to Manweta AI and to contact recipients through WhatsApp. We process this information to provide the service to the relevant business customer.</p>
+<h2>5. WhatsApp and other service providers</h2>
+<p>When a business customer uses WhatsApp messaging features, relevant recipient information and message content are transmitted to Meta's WhatsApp Business Platform to send or receive messages and obtain status updates. Use of WhatsApp is also subject to Meta's terms and policies. We may use hosting, database, infrastructure, and other service providers to operate Manweta AI; those providers process information as needed to provide their services to us.</p>
+<h2>6. Retention and deletion</h2>
+<p>We retain business account data, customer and accounting records, WhatsApp message history, and message status information for as long as needed to provide the service, maintain the business customer's records, resolve issues, and meet applicable legal or security requirements. Retention periods may differ by data type and customer configuration. Business customers can request deletion by following our <a href="/data-deletion">Data Deletion Instructions</a>. Some information may need to be retained for legal, security, dispute-resolution, or backup purposes for a limited period.</p>
+<h2>7. Security</h2>
+<p>We use appropriate technical and organisational measures designed to protect information. Access is limited to authorised purposes. No method of storage or transmission can be guaranteed to be completely secure. Details about specific safeguards should be understood in light of the controls actually implemented in the deployed service.</p>
+<h2>8. Contact</h2>
+<p>For privacy questions or data requests, contact <a href="mailto:support@manweta.com">support@manweta.com</a>.</p>
 </div></main></body></html>

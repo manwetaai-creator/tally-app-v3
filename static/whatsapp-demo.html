@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Manweta AI | WhatsApp API Demo</title>
+  <style>
+    :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#17211d;background:#f4f7f5}
+    *{box-sizing:border-box}body{margin:0;padding:32px 16px}.wrap{max-width:760px;margin:0 auto}
+    .brand{font-size:14px;color:#496257;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    h1{font-size:clamp(26px,4vw,36px);margin:12px 0 8px}.sub{color:#62716a;line-height:1.6}
+    .card{background:#fff;border:1px solid #dfe7e2;border-radius:18px;padding:24px;margin-top:24px;box-shadow:0 8px 28px #183f2b0b}
+    label{display:block;font-size:14px;font-weight:650;margin:18px 0 8px}
+    input{width:100%;padding:13px 14px;border:1px solid #cbd8d0;border-radius:10px;font:inherit}
+    button{margin-top:18px;background:#176b45;color:#fff;border:0;border-radius:10px;padding:13px 18px;font:inherit;font-weight:700;cursor:pointer}
+    button:disabled{opacity:.55;cursor:wait}.hint{font-size:13px;color:#6b7771;line-height:1.5}
+    #status{margin-top:18px;padding:12px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+    #status:empty{display:none}.ok{background:#e7f6ec;color:#145c35}.err{background:#fff0ed;color:#9b2c1e}
+    .preview{background:#eef8f1;border-radius:12px;padding:16px;line-height:1.5;margin-top:10px}
+    code{background:#f0f3f1;padding:2px 5px;border-radius:4px}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">Manweta AI · WhatsApp Cloud API</div>
+  <h1>Send a WhatsApp test message</h1>
+  <p class="sub">This demo sends Meta's <code>hello_world</code> template through the WhatsApp Cloud API. Keep this page and WhatsApp Web visible during your App Review recording.</p>
+  <section class="card">
+    <h2>Test message</h2>
+    <p class="hint">For safety, this demo endpoint only permits the single recipient configured by your server administrator in <code>META_DEMO_RECIPIENT</code>.</p>
+    <form id="send-form">
+      <label for="demo-key">Demo access key</label>
+      <input id="demo-key" type="password" autocomplete="off" required placeholder="Enter the demo key configured by the administrator">
+      <label for="recipient">Recipient WhatsApp number</label>
+      <input id="recipient" type="tel" inputmode="numeric" required placeholder="Country code + number, digits only">
+      <div class="preview"><strong>Template preview</strong><br>Hello World! This is a test message from Manweta AI.</div>
+      <button id="send" type="submit">Send test WhatsApp message</button>
+    </form>
+    <div id="status" role="status" aria-live="polite"></div>
+  </section>
+  <p class="hint">A successful API response means Meta accepted the request. Verify the message actually appears in the recipient's WhatsApp before recording the final evidence. Never share your permanent access token in this page.</p>
+</main>
+<script>
+const form=document.getElementById("send-form"),button=document.getElementById("send"),statusBox=document.getElementById("status");
+form.addEventListener("submit",async(event)=>{
+  event.preventDefault();button.disabled=true;button.textContent="Sending…";
+  statusBox.className="";statusBox.textContent="Sending request to WhatsApp Cloud API…";
+  try{
+    const response=await fetch("/api/v1/demo/whatsapp/send",{
+      method:"POST",headers:{"Content-Type":"application/json","X-Demo-Key":document.getElementById("demo-key").value},
+      body:JSON.stringify({recipient:document.getElementById("recipient").value})
+    });
+    const result=await response.json();
+    if(!response.ok)throw new Error(result.detail||"Request failed");
+    statusBox.className="ok";
+    statusBox.textContent=`${result.message}\nRecipient: ${result.recipient}\nTemplate: ${result.template}\nMessage ID: ${result.message_id}`;
+  }catch(error){statusBox.className="err";statusBox.textContent="Could not send message: "+error.message}
+  finally{button.disabled=false;button.textContent="Send test WhatsApp message"}
+});
+</script>
+</body>
+</html>

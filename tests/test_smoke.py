@@ -153,3 +153,63 @@ def test_test_send_falls_back_to_hello_world_and_templates_api(monkeypatch):
             "body": "Hello {{1}}, {{2}} is due. Reply STOP to opt out.", "examples": ["A", "B"]})
         assert ok.status_code == 200 and ok.json()["template"]["status"] == "PENDING" and created["components"][0]["type"] == "BODY"
         assert c.delete("/api/v1/portal/whatsapp/templates/manweta_payment_reminder", headers=h).status_code == 200 and deleted == ["manweta_payment_reminder"]
+
+
+def test_restricted_whatsapp_demo_endpoint(monkeypatch):
+    from types import SimpleNamespace
+
+    from app.routers import demo_whatsapp
+
+    demo_page = client.get("/whatsapp-demo.html")
+    assert demo_page.status_code == 200 and "Send a WhatsApp test message" in demo_page.text
+
+    settings = SimpleNamespace(
+        meta_demo_access_key="demo-secret",
+        meta_demo_access_token="meta-token",
+        meta_demo_phone_number_id="123456",
+        meta_demo_recipient="15550100",
+        meta_graph_api_version="v25.0",
+        meta_http_timeout_seconds=20.0,
+    )
+    monkeypatch.setattr(demo_whatsapp, "get_settings", lambda: settings)
+
+    assert client.post("/api/v1/demo/whatsapp/send", json={"recipient": "15550100"}).status_code == 401
+    assert client.post(
+        "/api/v1/demo/whatsapp/send",
+        headers={"X-Demo-Key": "demo-secret"},
+        json={"recipient": "15550101"},
+    ).status_code == 403
+
+    sent = {}
+
+    class FakeResponse:
+        is_success = True
+        status_code = 200
+
+        def json(self):
+            return {"messages": [{"id": "wamid.demo"}]}
+
+    class FakeClient:
+        def __init__(self, timeout):
+            assert timeout == 20.0
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def post(self, url, headers, json):
+            sent.update(url=url, headers=headers, payload=json)
+            return FakeResponse()
+
+    monkeypatch.setattr(demo_whatsapp.httpx, "Client", FakeClient)
+    response = client.post(
+        "/api/v1/demo/whatsapp/send",
+        headers={"X-Demo-Key": "demo-secret"},
+        json={"recipient": "1-555-0100"},
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["message_id"] == "wamid.demo"
+    assert sent["headers"]["Authorization"] == "Bearer meta-token"
+    assert sent["payload"]["to"] == "15550100"
