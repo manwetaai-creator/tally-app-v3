@@ -159,7 +159,6 @@ def test_restricted_whatsapp_demo_endpoint(monkeypatch):
     from app import main
     from types import SimpleNamespace
 
-    from app.deps import get_auth
     from app.routers import demo_whatsapp
 
     monkeypatch.setattr(main, "settings", SimpleNamespace(meta_demo_recipient="+15550100"))
@@ -180,22 +179,14 @@ def test_restricted_whatsapp_demo_endpoint(monkeypatch):
         meta_http_timeout_seconds=20.0,
     )
     monkeypatch.setattr(demo_whatsapp, "get_settings", lambda: settings)
-
-    unauthenticated = client.post(
-        "/api/v1/demo/whatsapp/send",
-        json={"recipient": "+1 (555) 0100"},
-    )
-    assert unauthenticated.status_code == 401
-    monkeypatch.setitem(main.app.dependency_overrides, get_auth, lambda: object())
+    monkeypatch.setattr(demo_whatsapp, "_last_send_at", 0.0)
 
     assert client.post(
         "/api/v1/demo/whatsapp/send",
-        headers={"Authorization": "Bearer user-session"},
         json={"recipient": "15550101"},
     ).status_code == 403
     assert client.post(
         "/api/v1/demo/whatsapp/send",
-        headers={"Authorization": "Bearer user-session"},
         json={"recipient": "call 15550100"},
     ).status_code == 403
 
@@ -223,9 +214,9 @@ def test_restricted_whatsapp_demo_endpoint(monkeypatch):
             return FakeResponse()
 
     monkeypatch.setattr(demo_whatsapp.httpx, "Client", FakeClient)
+    monkeypatch.setattr(demo_whatsapp, "_last_send_at", 0.0)
     response = client.post(
         "/api/v1/demo/whatsapp/send",
-        headers={"Authorization": "Bearer user-session"},
         json={"recipient": "+1 (555) 0100"},
     )
     assert response.status_code == 200, response.text
@@ -235,10 +226,14 @@ def test_restricted_whatsapp_demo_endpoint(monkeypatch):
     assert sent["headers"]["Authorization"] == "Bearer meta-token"
     assert sent["payload"]["to"] == "15550100"
 
+    assert client.post(
+        "/api/v1/demo/whatsapp/send",
+        json={"recipient": "15550100"},
+    ).status_code == 429
+
     settings.meta_demo_recipient = "recipient 15550100"
     assert client.post(
         "/api/v1/demo/whatsapp/send",
-        headers={"Authorization": "Bearer user-session"},
         json={"recipient": "15550100"},
     ).status_code == 503
 
@@ -246,11 +241,9 @@ def test_restricted_whatsapp_demo_endpoint(monkeypatch):
 def test_demo_meta_errors_are_safe(monkeypatch):
     from types import SimpleNamespace
 
-    from app import main
-    from app.deps import get_auth
     from app.routers import demo_whatsapp
 
-    monkeypatch.setitem(main.app.dependency_overrides, get_auth, lambda: object())
+    monkeypatch.setattr(demo_whatsapp, "_last_send_at", 0.0)
     monkeypatch.setattr(
         demo_whatsapp,
         "get_settings",
@@ -287,7 +280,6 @@ def test_demo_meta_errors_are_safe(monkeypatch):
     monkeypatch.setattr(demo_whatsapp.httpx, "Client", FakeClient)
     response = client.post(
         "/api/v1/demo/whatsapp/send",
-        headers={"Authorization": "Bearer user-session"},
         json={"recipient": "15550100"},
     )
     assert response.status_code == 400

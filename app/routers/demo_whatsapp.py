@@ -5,16 +5,20 @@ in META_DEMO_RECIPIENT and only the hello_world template.
 """
 import logging
 import re
+import threading
+import time
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from ..config import get_settings
-from ..deps import AuthContext, get_auth
 
 router = APIRouter(prefix="/api/v1/demo/whatsapp", tags=["WhatsApp demo"])
 log = logging.getLogger("manweta.whatsapp_demo")
+_send_lock = threading.Lock()
+_last_send_at = 0.0
+_SEND_COOLDOWN_SECONDS = 30
 
 
 class SendDemoMessage(BaseModel):
@@ -53,8 +57,9 @@ def _meta_error_message(data: object, token: str, phone_number_id: str) -> str:
 @router.post("/send")
 def send_demo_message(
     body: SendDemoMessage,
-    _auth: AuthContext = Depends(get_auth),
 ):
+    global _last_send_at
+
     s = get_settings()
     token = s.meta_demo_access_token
     phone_number_id = s.meta_demo_phone_number_id
@@ -67,6 +72,13 @@ def send_demo_message(
     recipient = normalize_recipient(body.recipient)
     if recipient != allowed_recipient:
         raise HTTPException(403, "For this demo, messages can only be sent to the configured META_DEMO_RECIPIENT.")
+
+    with _send_lock:
+        now = time.monotonic()
+        retry_after = _SEND_COOLDOWN_SECONDS - (now - _last_send_at)
+        if retry_after > 0:
+            raise HTTPException(429, f"Please wait {int(retry_after) + 1} seconds before sending another demo message.")
+        _last_send_at = now
 
     url = f"https://graph.facebook.com/{s.meta_graph_api_version}/{phone_number_id}/messages"
     payload = {

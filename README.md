@@ -137,7 +137,8 @@ while the custom template is under review, plain-HTML `/privacy`, `/terms`, `/da
 
 For a temporary first-video demo, `/whatsapp-demo` (also available at `/whatsapp-demo.html`) sends Meta's
 `hello_world` template through `POST /api/v1/demo/whatsapp/send`. Configure `META_DEMO_ACCESS_TOKEN`,
-`META_DEMO_PHONE_NUMBER_ID`, and `META_DEMO_RECIPIENT` server-side. Sending requires an authenticated
-Manweta account and the endpoint only accepts the configured recipient; neither the Meta token nor a separate
-demo key is exposed in the browser. Remove or disable the demo settings and endpoint after recording App Review
+`META_DEMO_PHONE_NUMBER_ID`, and `META_DEMO_RECIPIENT` server-side. Sending does not require a Manweta login;
+the endpoint only accepts the configured recipient, and neither the Meta token nor a separate demo key is exposed
+in the browser. The public demo send endpoint applies a short per-worker cooldown and remains
+restricted to the configured recipient. Remove or disable the demo settings and endpoint after recording App Review
 evidence. Confirm the legal-page statements in `static/pages/` match the deployed data practices before publishing.

@@ -40,7 +40,6 @@
     input{width:100%;min-height:46px;padding:12px 13px;border:1px solid #dce2ed;border-radius:10px;outline:none;background:#fff;color:#182641;font:inherit;font-size:14px;transition:border-color .15s,box-shadow .15s}
     input:focus{border-color:#5b67df;box-shadow:0 0 0 3px #5b67df1d}
     .help{margin:8px 0 0;color:#8993a5;font-size:12px;line-height:1.5}
-    .login-link{display:block;margin-top:8px;color:#4758d7;font-weight:650}
     button{width:100%;min-height:48px;margin-top:19px;border:0;border-radius:11px;background:linear-gradient(100deg,#4758d7,#5f61e9);color:#fff;font:inherit;font-size:14px;font-weight:750;box-shadow:0 7px 16px #5660dd30;cursor:pointer;transition:filter .15s,transform .15s}
     button:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px)}
     button:disabled{opacity:.62;cursor:wait;box-shadow:none}
@@ -72,7 +71,7 @@
   <main>
     <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Demo Environment</span>
     <h1>Send a WhatsApp Message</h1>
-    <p class="intro">Send Meta's approved test template through the WhatsApp Cloud API. Sign in to your Manweta account first; for safety, the server only sends to the configured demo recipient.</p>
+    <p class="intro">Send Meta's approved test template through the WhatsApp Cloud API. For safety, the server only sends to the configured demo recipient.</p>
 
     <div class="layout">
       <section class="card" aria-labelledby="template-heading">
@@ -122,22 +121,9 @@
     const statusBox=document.getElementById("status");
     let sending=false;
 
-    function showLoginRequired(){
-      statusBox.dataset.state="error";
-      statusBox.textContent="Sign in to your Manweta AI account before sending a test message.";
-      const link=document.createElement("a");
-      link.className="login-link";
-      link.href="/";
-      link.textContent="Sign in to Manweta AI";
-      statusBox.append(link);
-    }
-
     form.addEventListener("submit",async(event)=>{
       event.preventDefault();
       if(sending)return;
-      let token;
-      try{token=localStorage.getItem("manweta_token")}catch{showLoginRequired();return;}
-      if(!token){showLoginRequired();return;}
       sending=true;
       button.disabled=true;
       button.setAttribute("aria-busy","true");
@@ -148,12 +134,11 @@
       try{
         const response=await fetch("/api/v1/demo/whatsapp/send",{
           method:"POST",
-          headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+          headers:{"Content-Type":"application/json"},
           body:JSON.stringify({recipient:document.getElementById("recipient").value})
         });
         let result;
         try{result=await response.json()}catch{throw new Error("The server returned an unreadable response. Please try again.")}
-        if(response.status===401){showLoginRequired();return;}
         if(!response.ok)throw new Error(typeof result.detail==="string"?result.detail:"The message request failed. Please try again.");
         if(result.success!==true)throw new Error("The server did not confirm that Meta accepted the message.");
 
