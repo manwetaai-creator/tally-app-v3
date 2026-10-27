@@ -3,60 +3,182 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Manweta AI | WhatsApp API Demo</title>
+  <meta name="theme-color" content="#101a30">
+  <title>WhatsApp Message Demo | Manweta AI</title>
   <style>
-    :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#17211d;background:#f4f7f5}
-    *{box-sizing:border-box}body{margin:0;padding:32px 16px}.wrap{max-width:760px;margin:0 auto}
-    .brand{font-size:14px;color:#496257;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-    h1{font-size:clamp(26px,4vw,36px);margin:12px 0 8px}.sub{color:#62716a;line-height:1.6}
-    .card{background:#fff;border:1px solid #dfe7e2;border-radius:18px;padding:24px;margin-top:24px;box-shadow:0 8px 28px #183f2b0b}
-    label{display:block;font-size:14px;font-weight:650;margin:18px 0 8px}
-    input{width:100%;padding:13px 14px;border:1px solid #cbd8d0;border-radius:10px;font:inherit}
-    button{margin-top:18px;background:#176b45;color:#fff;border:0;border-radius:10px;padding:13px 18px;font:inherit;font-weight:700;cursor:pointer}
-    button:disabled{opacity:.55;cursor:wait}.hint{font-size:13px;color:#6b7771;line-height:1.5}
-    #status{margin-top:18px;padding:12px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere}
-    #status:empty{display:none}.ok{background:#e7f6ec;color:#145c35}.err{background:#fff0ed;color:#9b2c1e}
-    .preview{background:#eef8f1;border-radius:12px;padding:16px;line-height:1.5;margin-top:10px}
-    code{background:#f0f3f1;padding:2px 5px;border-radius:4px}
+    :root{font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;color:#17233b;background:#f4f6fb;font-synthesis:none;text-rendering:optimizeLegibility}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 82% 0,#e9eaff 0,transparent 36%),#f4f6fb}
+    .topbar{height:74px;background:#fff;border-bottom:1px solid #e7eaf2}
+    .topbar-inner{width:min(1080px,calc(100% - 40px));height:100%;margin:auto;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:11px;color:#17233b;text-decoration:none;font-weight:750;letter-spacing:-.03em}
+    .brand-logo{width:40px;height:40px;object-fit:contain}
+    .brand-name{font-size:18px}.top-note{font-size:13px;color:#748097}
+    main{width:min(930px,calc(100% - 40px));margin:46px auto 64px}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #dfe4f1;border-radius:999px;background:#fff;color:#455477;font-size:12px;font-weight:700;letter-spacing:.045em;text-transform:uppercase}
+    .eyebrow-dot{width:7px;height:7px;border-radius:50%;background:#20a878;box-shadow:0 0 0 3px #20a87820}
+    h1{margin:17px 0 9px;color:#15213a;font-size:clamp(30px,5vw,43px);line-height:1.12;letter-spacing:-.045em}
+    .intro{max-width:660px;margin:0;color:#65718a;font-size:16px;line-height:1.65}
+    .layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:22px;margin-top:30px;align-items:start}
+    .card{border:1px solid #e4e8f0;border-radius:18px;background:#fff;box-shadow:0 12px 34px #24355b0b}
+    .card-head{padding:21px 23px 17px;border-bottom:1px solid #eef0f5}
+    h2{margin:0;font-size:17px;letter-spacing:-.02em;color:#1b2944}
+    .card-subtitle{margin:5px 0 0;color:#8490a4;font-size:13px}
+    .card-body{padding:21px 23px 23px}
+    .meta-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid #f0f2f6;font-size:13px}
+    .meta-row:last-of-type{border-bottom:0}
+    .meta-label{color:#7b879b}.meta-value{color:#293957;font-weight:650;text-align:right}
+    .chat-shell{margin-top:15px;padding:15px;border-radius:13px;background:#e8f2ed}
+    .chat-label{margin:0 0 11px;color:#71847b;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+    .bubble{position:relative;max-width:95%;padding:12px 13px;border:1px solid #e2e8e4;border-radius:4px 13px 13px 13px;background:#fff;color:#26382f;font-size:14px;line-height:1.55;box-shadow:0 2px 4px #183f2b08}
+    .bubble-time{display:block;margin-top:5px;color:#91a096;font-size:10px;text-align:right}
+    .form-card{padding:23px}
+    .recipient{display:flex;align-items:center;gap:11px;margin:17px 0 20px;padding:13px;border:1px solid #e8ebf2;border-radius:12px;background:#fafbfe}
+    .recipient-icon{width:36px;height:36px;flex:none;display:grid;place-items:center;border-radius:10px;background:#e8f6f0;color:#18885f;font-size:17px}
+    .recipient-info{min-width:0}.recipient-title{color:#7e899e;font-size:11px}.recipient-number{margin-top:3px;color:#253653;font-size:14px;font-weight:700;letter-spacing:.035em}
+    label{display:block;margin:0 0 8px;color:#34425d;font-size:13px;font-weight:650}
+    input{width:100%;min-height:46px;padding:12px 13px;border:1px solid #dce2ed;border-radius:10px;outline:none;background:#fff;color:#182641;font:inherit;font-size:14px;transition:border-color .15s,box-shadow .15s}
+    input:focus{border-color:#5b67df;box-shadow:0 0 0 3px #5b67df1d}
+    .help{margin:8px 0 0;color:#8993a5;font-size:12px;line-height:1.5}
+    .login-link{display:block;margin-top:8px;color:#4758d7;font-weight:650}
+    button{width:100%;min-height:48px;margin-top:19px;border:0;border-radius:11px;background:linear-gradient(100deg,#4758d7,#5f61e9);color:#fff;font:inherit;font-size:14px;font-weight:750;box-shadow:0 7px 16px #5660dd30;cursor:pointer;transition:filter .15s,transform .15s}
+    button:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px)}
+    button:disabled{opacity:.62;cursor:wait;box-shadow:none}
+    .button-content{display:inline-flex;align-items:center;justify-content:center;gap:9px}
+    .spinner{display:none;width:15px;height:15px;border:2px solid #ffffff70;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+    button[aria-busy="true"] .spinner{display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #status{display:none;margin-top:15px;padding:13px 14px;border:1px solid transparent;border-radius:11px;font-size:13px;line-height:1.55;overflow-wrap:anywhere}
+    #status[data-state="success"]{display:block;border-color:#ccebdc;background:#f0fbf5;color:#166440}
+    #status[data-state="error"]{display:block;border-color:#f1d8d5;background:#fff6f5;color:#9b332c}
+    .message-id{display:block;margin-top:7px;font-size:12px}.message-id code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+    .footnote{display:flex;gap:9px;align-items:flex-start;margin:22px 2px 0;color:#78849a;font-size:12px;line-height:1.6}
+    .footnote-icon{flex:none;color:#5d6be0;font-size:15px}
+    @media(max-width:720px){main{margin-top:32px}.layout{grid-template-columns:1fr;gap:16px}.top-note{display:none}}
+    @media(max-width:420px){.topbar-inner,main{width:calc(100% - 28px)}.card-head,.card-body,.form-card{padding-left:17px;padding-right:17px}.layout{margin-top:23px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
   </style>
 </head>
 <body>
-<main class="wrap">
-  <div class="brand">Manweta AI · WhatsApp Cloud API</div>
-  <h1>Send a WhatsApp test message</h1>
-  <p class="sub">This demo sends Meta's <code>hello_world</code> template through the WhatsApp Cloud API. Keep this page and WhatsApp Web visible during your App Review recording.</p>
-  <section class="card">
-    <h2>Test message</h2>
-    <p class="hint">For safety, this demo endpoint only permits the single recipient configured by your server administrator in <code>META_DEMO_RECIPIENT</code>.</p>
-    <form id="send-form">
-      <label for="demo-key">Demo access key</label>
-      <input id="demo-key" type="password" autocomplete="off" required placeholder="Enter the demo key configured by the administrator">
-      <label for="recipient">Recipient WhatsApp number</label>
-      <input id="recipient" type="tel" inputmode="numeric" required placeholder="Country code + number, digits only">
-      <div class="preview"><strong>Template preview</strong><br>Hello World! This is a test message from Manweta AI.</div>
-      <button id="send" type="submit">Send test WhatsApp message</button>
-    </form>
-    <div id="status" role="status" aria-live="polite"></div>
-  </section>
-  <p class="hint">A successful API response means Meta accepted the request. Verify the message actually appears in the recipient's WhatsApp before recording the final evidence. Never share your permanent access token in this page.</p>
-</main>
-<script>
-const form=document.getElementById("send-form"),button=document.getElementById("send"),statusBox=document.getElementById("status");
-form.addEventListener("submit",async(event)=>{
-  event.preventDefault();button.disabled=true;button.textContent="Sending…";
-  statusBox.className="";statusBox.textContent="Sending request to WhatsApp Cloud API…";
-  try{
-    const response=await fetch("/api/v1/demo/whatsapp/send",{
-      method:"POST",headers:{"Content-Type":"application/json","X-Demo-Key":document.getElementById("demo-key").value},
-      body:JSON.stringify({recipient:document.getElementById("recipient").value})
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="Manweta AI home">
+        <img class="brand-logo" src="/assets/logo.png" alt="Manweta AI logo">
+        <span class="brand-name">Manweta AI</span>
+      </a>
+      <span class="top-note">WhatsApp Cloud API · Meta Tech Provider Review</span>
+    </div>
+  </header>
+  <main>
+    <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Demo Environment</span>
+    <h1>Send a WhatsApp Message</h1>
+    <p class="intro">Send Meta's approved test template through the WhatsApp Cloud API. Sign in to your Manweta account first; for safety, the server only sends to the configured demo recipient.</p>
+
+    <div class="layout">
+      <section class="card" aria-labelledby="template-heading">
+        <div class="card-head">
+          <h2 id="template-heading">Message template</h2>
+          <p class="card-subtitle">Read-only preview of the message sent by this demo</p>
+        </div>
+        <div class="card-body">
+          <div class="meta-row"><span class="meta-label">Template</span><span class="meta-value">hello_world</span></div>
+          <div class="meta-row"><span class="meta-label">Language</span><span class="meta-value">en_US</span></div>
+          <div class="chat-shell" aria-label="WhatsApp message preview">
+            <p class="chat-label">WhatsApp message preview</p>
+            <div class="bubble">Hello World! This is a test message.<span class="bubble-time">now ✓✓</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="send-heading">
+        <div class="form-card">
+          <h2 id="send-heading">Send test message</h2>
+          <div class="recipient">
+            <span class="recipient-icon" aria-hidden="true">◉</span>
+            <div class="recipient-info">
+              <div class="recipient-title">Allowed demo recipient</div>
+              <div class="recipient-number" id="recipient-display">{{RECIPIENT_MASKED}}</div>
+            </div>
+          </div>
+          <form id="send-form">
+            <label for="recipient">Recipient mobile number</label>
+            <input id="recipient" name="recipient" type="tel" inputmode="tel" autocomplete="tel" minlength="8" maxlength="20" required placeholder="Enter number with country code">
+            <p class="help">Enter the number shown above. The server rejects any number other than its configured demo recipient.</p>
+            <button id="send" type="submit">
+              <span class="button-content"><span class="spinner" aria-hidden="true"></span><span id="button-label">Send Test Message</span></span>
+            </button>
+          </form>
+          <div id="status" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+
+    <p class="footnote"><span class="footnote-icon" aria-hidden="true">ⓘ</span><span>After Meta accepts the request, verify that the message arrives in WhatsApp Web. API acceptance is not a delivery confirmation.</span></p>
+  </main>
+  <script>
+    const form=document.getElementById("send-form");
+    const button=document.getElementById("send");
+    const buttonLabel=document.getElementById("button-label");
+    const statusBox=document.getElementById("status");
+    let sending=false;
+
+    function showLoginRequired(){
+      statusBox.dataset.state="error";
+      statusBox.textContent="Sign in to your Manweta AI account before sending a test message.";
+      const link=document.createElement("a");
+      link.className="login-link";
+      link.href="/";
+      link.textContent="Sign in to Manweta AI";
+      statusBox.append(link);
+    }
+
+    form.addEventListener("submit",async(event)=>{
+      event.preventDefault();
+      if(sending)return;
+      let token;
+      try{token=localStorage.getItem("manweta_token")}catch{showLoginRequired();return;}
+      if(!token){showLoginRequired();return;}
+      sending=true;
+      button.disabled=true;
+      button.setAttribute("aria-busy","true");
+      buttonLabel.textContent="Sending message…";
+      statusBox.dataset.state="";
+      statusBox.textContent="";
+
+      try{
+        const response=await fetch("/api/v1/demo/whatsapp/send",{
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+          body:JSON.stringify({recipient:document.getElementById("recipient").value})
+        });
+        let result;
+        try{result=await response.json()}catch{throw new Error("The server returned an unreadable response. Please try again.")}
+        if(response.status===401){showLoginRequired();return;}
+        if(!response.ok)throw new Error(typeof result.detail==="string"?result.detail:"The message request failed. Please try again.");
+        if(result.success!==true)throw new Error("The server did not confirm that Meta accepted the message.");
+
+        statusBox.dataset.state="success";
+        statusBox.textContent=typeof result.message==="string"?result.message:"Meta accepted the test message. Verify delivery in WhatsApp.";
+        if(typeof result.message_id==="string"&&result.message_id){
+          const idLine=document.createElement("span");
+          idLine.className="message-id";
+          const idLabel=document.createElement("span");
+          idLabel.textContent="WhatsApp message ID: ";
+          const id=document.createElement("code");
+          id.textContent=result.message_id;
+          idLine.append(idLabel,id);
+          statusBox.append(idLine);
+        }
+      }catch(error){
+        statusBox.dataset.state="error";
+        statusBox.textContent="Message not sent: "+(error instanceof Error?error.message:"Unexpected error. Please try again.");
+      }finally{
+        sending=false;
+        button.disabled=false;
+        button.removeAttribute("aria-busy");
+        buttonLabel.textContent="Send Test Message";
+      }
     });
-    const result=await response.json();
-    if(!response.ok)throw new Error(result.detail||"Request failed");
-    statusBox.className="ok";
-    statusBox.textContent=`${result.message}\nRecipient: ${result.recipient}\nTemplate: ${result.template}\nMessage ID: ${result.message_id}`;
-  }catch(error){statusBox.className="err";statusBox.textContent="Could not send message: "+error.message}
-  finally{button.disabled=false;button.textContent="Send test WhatsApp message"}
-});
-</script>
+  </script>
 </body>
 </html>

@@ -45,7 +45,6 @@ class Settings(BaseSettings):
     meta_demo_access_token: str = ""
     meta_demo_phone_number_id: str = ""
     meta_demo_recipient: str = ""
-    meta_demo_access_key: str = ""
 
     # --- Windows installer / Azure Blob Storage ----------------------------
     windows_installer_version: str = "v1.4.2"

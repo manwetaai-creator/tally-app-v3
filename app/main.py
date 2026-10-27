@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
@@ -80,6 +80,17 @@ def _public_page(slug: str):
 
 for _slug in ("privacy", "terms", "data-deletion"):
     app.add_api_route(f"/{_slug}", _public_page(_slug), methods=["GET"], include_in_schema=False)
+
+
+@app.get("/whatsapp-demo", include_in_schema=False)
+@app.get("/whatsapp-demo.html", include_in_schema=False)
+def whatsapp_demo_page():
+    page = (STATIC / "whatsapp-demo.html").read_text(encoding="utf-8")
+    masked_recipient = demo_whatsapp.mask_recipient(settings.meta_demo_recipient)
+    return HTMLResponse(
+        page.replace("{{RECIPIENT_MASKED}}", masked_recipient),
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.get("/{full_path:path}", include_in_schema=False)

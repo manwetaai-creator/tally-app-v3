@@ -3,15 +3,15 @@
 Enable only temporarily for the demo. It can send only the one recipient configured
 in META_DEMO_RECIPIENT and only the hello_world template.
 """
-import hmac
 import logging
 import re
 
 import httpx
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from ..config import get_settings
+from ..deps import AuthContext, get_auth
 
 router = APIRouter(prefix="/api/v1/demo/whatsapp", tags=["WhatsApp demo"])
 log = logging.getLogger("manweta.whatsapp_demo")
@@ -21,24 +21,51 @@ class SendDemoMessage(BaseModel):
     recipient: str = Field(min_length=8, max_length=20)
 
 
+def normalize_recipient(recipient: str) -> str:
+    value = recipient.strip()
+    if not re.fullmatch(r"\+?[\d\s().-]+", value):
+        return ""
+    digits = re.sub(r"\D", "", value)
+    return digits if 8 <= len(digits) <= 15 else ""
+
+
+def mask_recipient(recipient: str) -> str:
+    digits = normalize_recipient(recipient or "")
+    if not digits:
+        return "Not configured"
+    return f"{'+' if recipient.strip().startswith('+') else ''}{'•' * (len(digits) - 4)}{digits[-4:]}"
+
+
+def _meta_error_message(data: object, token: str, phone_number_id: str) -> str:
+    generic_message = "Meta rejected the message request. Check the demo configuration and try again."
+    if not isinstance(data, dict):
+        return generic_message
+    error = data.get("error")
+    if not isinstance(error, dict) or not isinstance(error.get("message"), str):
+        return generic_message
+    message = " ".join(error["message"].split())
+    for secret in (token, phone_number_id):
+        if secret:
+            message = message.replace(secret, "[redacted]")
+    return message[:300] or generic_message
+
+
 @router.post("/send")
 def send_demo_message(
     body: SendDemoMessage,
-    x_demo_key: str | None = Header(default=None, alias="X-Demo-Key"),
+    _auth: AuthContext = Depends(get_auth),
 ):
     s = get_settings()
-    expected_key = s.meta_demo_access_key
     token = s.meta_demo_access_token
     phone_number_id = s.meta_demo_phone_number_id
-    allowed_recipient = re.sub(r"\D", "", s.meta_demo_recipient or "")
+    configured_recipient = s.meta_demo_recipient or ""
+    allowed_recipient = normalize_recipient(configured_recipient)
 
     # Fail closed unless every demo-only setting is present.
-    if not all([expected_key, token, phone_number_id, allowed_recipient]):
+    if not all([token, phone_number_id, allowed_recipient]):
         raise HTTPException(503, "WhatsApp demo is not configured. Set the META_DEMO_* environment variables.")
-    if not x_demo_key or not hmac.compare_digest(x_demo_key, expected_key):
-        raise HTTPException(401, "Invalid demo key.")
-    recipient = re.sub(r"\D", "", body.recipient or "")
-    if not recipient or recipient != allowed_recipient:
+    recipient = normalize_recipient(body.recipient)
+    if recipient != allowed_recipient:
         raise HTTPException(403, "For this demo, messages can only be sent to the configured META_DEMO_RECIPIENT.")
 
     url = f"https://graph.facebook.com/{s.meta_graph_api_version}/{phone_number_id}/messages"
@@ -58,22 +85,24 @@ def send_demo_message(
         try:
             data = response.json()
         except ValueError:
-            data = {"error": {"message": response.text[:300]}}
+            data = None
         if not response.is_success:
-            error = data.get("error") or {}
-            # Do not return request headers or access token to the browser.
-            raise HTTPException(response.status_code, error.get("message", "Meta rejected the message request."))
-        messages = data.get("messages") or []
-        message_id = messages[0].get("id") if messages else None
-        if not message_id:
+            raise HTTPException(
+                response.status_code,
+                _meta_error_message(data, token, phone_number_id),
+            )
+        messages = data.get("messages") if isinstance(data, dict) else None
+        message = messages[0] if isinstance(messages, list) and messages else None
+        message_id = message.get("id") if isinstance(message, dict) else None
+        if not isinstance(message_id, str) or not message_id:
             raise HTTPException(502, "Meta returned success without a message ID.")
         return {
             "success": True,
             "message": "Meta accepted the test message. Confirm actual delivery in WhatsApp.",
             "message_id": message_id,
-            "recipient": recipient,
+            "recipient_masked": mask_recipient(configured_recipient),
             "template": "hello_world",
         }
-    except httpx.RequestError:
-        log.exception("Unable to connect to Meta Graph API")
+    except httpx.RequestError as exc:
+        log.warning("Meta Graph API request failed (%s)", type(exc).__name__)
         raise HTTPException(502, "Could not connect to Meta Graph API. Try again.")
